@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { SplitRow } from './SplitRow';
-import { tagCategories, formatCurrency, createEmptySplit, type Split } from '../data/mockData';
+import { tagCategories, getTagCategoriesWithLongNames, formatCurrency, createEmptySplit, type Split } from '../data/mockData';
 import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 
 interface DistributionTableProps {
@@ -11,6 +11,9 @@ interface DistributionTableProps {
   showLineDescription: boolean;
   compact: boolean;
   tagDisplayMode: 'text' | 'pills' | 'pills-inline';
+  tagNameDisplay?: 'full' | 'truncate-tooltip' | 'code-only';
+  longTagNames?: boolean;
+  showTagDetails?: boolean;
   hideFooter?: boolean;
   onAddSplit?: () => void;
 }
@@ -23,9 +26,17 @@ export function DistributionTable({
   showLineDescription,
   compact,
   tagDisplayMode,
+  tagNameDisplay = 'full',
+  longTagNames = false,
+  showTagDetails = false,
   hideFooter = false,
   onAddSplit,
 }: DistributionTableProps) {
+  const activeTagCategories = useMemo(
+    () => (longTagNames ? getTagCategoriesWithLongNames() : tagCategories),
+    [longTagNames]
+  );
+
   // Drag and drop state
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -115,7 +126,7 @@ export function DistributionTable({
             Fund
           </div>
           {visibleTagColumns.map((categoryId) => {
-            const category = tagCategories.find((c) => c.id === categoryId);
+            const category = activeTagCategories.find((c) => c.id === categoryId);
             return (
               <div
                 key={categoryId}
@@ -150,6 +161,9 @@ export function DistributionTable({
               showLineDescription={showLineDescription}
               compact={compact}
               tagDisplayMode={tagDisplayMode}
+              tagNameDisplay={tagNameDisplay}
+              longTagNames={longTagNames}
+              showTagDetails={showTagDetails}
               totalAmount={totalAmount}
               rowIndex={index}
               canDelete={splits.length > 1}

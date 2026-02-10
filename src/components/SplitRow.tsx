@@ -6,6 +6,7 @@ import {
   accounts,
   funds,
   tagCategories,
+  getTagCategoriesWithLongNames,
   formatAccountDisplay,
   formatFundDisplay,
   type Split,
@@ -19,6 +20,9 @@ interface SplitRowProps {
   showLineDescription: boolean;
   compact: boolean;
   tagDisplayMode: 'text' | 'pills' | 'pills-inline';
+  tagNameDisplay?: 'full' | 'truncate-tooltip' | 'code-only';
+  longTagNames?: boolean;
+  showTagDetails?: boolean;
   totalAmount: number;
   rowIndex: number;
   canDelete: boolean;
@@ -38,6 +42,9 @@ export function SplitRow({
   showLineDescription,
   compact,
   tagDisplayMode,
+  tagNameDisplay = 'full',
+  longTagNames = false,
+  showTagDetails = false,
   totalAmount,
   rowIndex,
   canDelete,
@@ -73,8 +80,10 @@ export function SplitRow({
     onChange(updated);
   };
 
+  const activeTagCategories = longTagNames ? getTagCategoriesWithLongNames() : tagCategories;
+
   const getTagsForCategory = (categoryId: string) => {
-    const category = tagCategories.find((c) => c.id === categoryId);
+    const category = activeTagCategories.find((c) => c.id === categoryId);
     return category?.tags || [];
   };
 
@@ -117,6 +126,20 @@ export function SplitRow({
 
   const cellPadding = compact ? 'px-1.5 py-1' : 'px-2 py-1.5';
 
+  // Get all tag assignments for expanded detail view
+  const getExpandedTagDetails = () => {
+    const details: { category: string; tags: { code: string; name: string }[] }[] = [];
+    for (const categoryId of visibleTagColumns) {
+      const category = activeTagCategories.find((c) => c.id === categoryId);
+      if (!category) continue;
+      const ids = getSelectedTagIds(categoryId);
+      if (ids.length === 0) continue;
+      const tags = category.tags.filter((t) => ids.includes(t.id));
+      details.push({ category: category.name, tags });
+    }
+    return details;
+  };
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', String(rowIndex));
@@ -134,6 +157,7 @@ export function SplitRow({
   };
 
   return (
+    <>
     <div
       className={`
         group relative flex items-center transition-colors
@@ -157,7 +181,7 @@ export function SplitRow({
       </div>
 
       {/* Row content */}
-      <div className="flex flex-1 items-center">
+      <div className="flex flex-1 items-center min-w-0">
         {/* Account */}
         <div className={`${cellPadding} flex-1 min-w-[120px]`} data-cell>
           <SelectField
@@ -182,7 +206,7 @@ export function SplitRow({
 
         {/* Tag columns */}
         {visibleTagColumns.map((categoryId) => {
-          const category = tagCategories.find((c) => c.id === categoryId);
+          const category = activeTagCategories.find((c) => c.id === categoryId);
           return (
             <div key={categoryId} className={`${cellPadding} flex-1 min-w-[100px]`} data-cell>
               <TagSelect
@@ -192,6 +216,7 @@ export function SplitRow({
                 placeholder={category?.name || ''}
                 compact={compact}
                 displayMode={tagDisplayMode}
+                nameDisplay={tagNameDisplay}
               />
             </div>
           );
@@ -246,6 +271,26 @@ export function SplitRow({
         )}
       </div>
     </div>
+
+    {/* Tag detail strip — controlled by "Tag details" toggle */}
+    {showTagDetails && (tagNameDisplay === 'truncate-tooltip' || tagNameDisplay === 'code-only') && (
+      <div className={`bg-gray-50 border-t border-gray-100 ${compact ? 'px-3 py-1.5' : 'px-4 py-2'}`}>
+        <div className="flex flex-wrap gap-x-6 gap-y-1">
+          {getExpandedTagDetails().map(({ category, tags }) => (
+            <div key={category} className={`flex items-baseline gap-1.5 ${compact ? 'text-[10px]' : 'text-xs'}`}>
+              <span className="font-medium text-gray-500">{category}:</span>
+              <span className="text-gray-700">
+                {tags.map((t) => `${t.code} - ${t.name}`).join(', ')}
+              </span>
+            </div>
+          ))}
+          {getExpandedTagDetails().length === 0 && (
+            <span className={`text-gray-400 italic ${compact ? 'text-[10px]' : 'text-xs'}`}>No tags assigned</span>
+          )}
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 

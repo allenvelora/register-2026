@@ -20,6 +20,7 @@ interface TransactionFormProps {
 export function TransactionForm({ controlState, visibleTagColumns }: TransactionFormProps) {
   const [transaction, setTransaction] = useState<Transaction>(sampleTransaction);
   const [showLineDescription, setShowLineDescription] = useState(false);
+  const [showTagDetails, setShowTagDetails] = useState(false);
 
   const handleFieldChange = <K extends keyof Transaction>(field: K, value: Transaction[K]) => {
     setTransaction((t) => ({ ...t, [field]: value }));
@@ -154,20 +155,36 @@ export function TransactionForm({ controlState, visibleTagColumns }: Transaction
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className={`font-medium text-gray-700 ${labelClass}`}>Distribution</h3>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <span className={`text-gray-500 ${compact ? 'text-xs' : 'text-sm'}`}>
-              Line description
-            </span>
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={showLineDescription}
-                onChange={(e) => setShowLineDescription(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-8 h-[18px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-blue-600"></div>
-            </div>
-          </label>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className={`text-gray-500 ${compact ? 'text-xs' : 'text-sm'}`}>
+                Tag details
+              </span>
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={showTagDetails}
+                  onChange={(e) => setShowTagDetails(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-8 h-[18px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-blue-600"></div>
+              </div>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className={`text-gray-500 ${compact ? 'text-xs' : 'text-sm'}`}>
+                Line description
+              </span>
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={showLineDescription}
+                  onChange={(e) => setShowLineDescription(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-8 h-[18px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[14px] after:w-[14px] after:transition-all peer-checked:bg-blue-600"></div>
+              </div>
+            </label>
+          </div>
         </div>
 
         <DistributionTable
@@ -178,6 +195,9 @@ export function TransactionForm({ controlState, visibleTagColumns }: Transaction
           showLineDescription={showLineDescription}
           compact={compact}
           tagDisplayMode={controlState.tagDisplayMode}
+          tagNameDisplay={controlState.tagNameDisplay}
+          longTagNames={controlState.longTagNames}
+          showTagDetails={showTagDetails}
           hideFooter={consolidatedFooter}
           onAddSplit={handleAddSplit}
         />

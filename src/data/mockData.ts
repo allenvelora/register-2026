@@ -184,6 +184,44 @@ export const sampleTransaction: Transaction = {
   ],
 };
 
+// Long tag name variants for edge-case testing
+const longNameSuffix: Record<string, string> = {
+  'p1': 'Art for Youth - Community Enrichment & Cultural Development Program',
+  'p2': 'Community Project - Neighborhood Revitalization Initiative',
+  'p3': 'City Hall - Municipal Government Relations & Advocacy',
+  'p4': 'Music Therapy - Healing Through Sound & Rhythm Sessions',
+  'p5': 'After School - Extended Learning & Youth Development',
+  'e1': 'Annual Gala - Fundraising Dinner & Silent Auction Event',
+  'e2': 'Summer Camp - Outdoor Adventure & Leadership Training',
+  'e3': 'Christmas Concert - Holiday Musical Celebration & Benefit',
+  'e4': 'Fall Festival - Harvest Community Gathering & Fundraiser',
+  'e5': 'Board Retreat - Strategic Planning & Governance Workshop',
+  'd1': 'Administration - Executive Leadership & Office Management',
+  'd2': 'Finance - Accounting, Budget & Financial Compliance',
+  'd3': 'Operations - Facilities Management & Daily Operations',
+  'd4': 'Outreach - Community Engagement & Public Relations',
+  'd5': 'Development - Fundraising & Donor Relations Department',
+  'c1': 'Grant A - Federal Community Development Block Grant',
+  'c2': 'Grant B - State Youth Services Matching Grant',
+  'c3': 'Restricted - Donor Designated Purpose Restricted Funds',
+  'c4': 'Unrestricted - General Operating Support Contributions',
+  'c5': 'Capital - Building & Equipment Capital Campaign Funds',
+  'n1': 'Program Services - Direct Charitable Activity Expenses',
+  'n2': 'Management - General Administrative & Overhead Costs',
+  'n3': 'Fundraising - Development & Donor Solicitation Expenses',
+  'n4': 'Unrelated Business - Taxable Commercial Activity Income',
+};
+
+export function getTagCategoriesWithLongNames(): TagCategory[] {
+  return tagCategories.map((cat) => ({
+    ...cat,
+    tags: cat.tags.map((tag) => ({
+      ...tag,
+      name: longNameSuffix[tag.id] || tag.name,
+    })),
+  }));
+}
+
 // Helper functions
 export function getAccountById(id: string): Account | undefined {
   return accounts.find((a) => a.id === id);

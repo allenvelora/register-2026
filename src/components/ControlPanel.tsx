@@ -140,6 +140,25 @@ export function ControlPanel({
               value={state.tagDisplayMode}
               onChange={(v) => updateState('tagDisplayMode', v as ControlPanelState['tagDisplayMode'])}
             />
+            <RadioGroup
+              label="Tag Names"
+              options={[
+                { value: 'full', label: 'Full' },
+                { value: 'truncate-tooltip', label: 'Truncate' },
+                { value: 'code-only', label: 'Code' },
+              ]}
+              value={state.tagNameDisplay}
+              onChange={(v) => updateState('tagNameDisplay', v as ControlPanelState['tagNameDisplay'])}
+            />
+          </Section>
+
+          {/* Testing Section */}
+          <Section title="Testing">
+            <ToggleControl
+              label="Long Tag Names"
+              checked={state.longTagNames}
+              onChange={(v) => updateState('longTagNames', v)}
+            />
           </Section>
         </div>
       )}

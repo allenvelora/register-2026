@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 
 export interface ControlPanelState {
+  // Page
+  activePage: 'transactions' | 'reports';
+
   // Column visibility
   tagColumnCount: number; // 0-5
   
@@ -11,14 +14,21 @@ export interface ControlPanelState {
   // Display
   compactMode: boolean;
   tagDisplayMode: 'text' | 'pills' | 'pills-inline';
+  tagNameDisplay: 'full' | 'truncate-tooltip' | 'code-only';
+
+  // Testing
+  longTagNames: boolean;
 }
 
 const defaultState: ControlPanelState = {
+  activePage: 'transactions',
   tagColumnCount: 3,
   containerWidth: '1280',
   footerLayout: 'default',
   compactMode: false,
   tagDisplayMode: 'text',
+  tagNameDisplay: 'full',
+  longTagNames: false,
 };
 
 export function useControlPanel() {
