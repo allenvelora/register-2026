@@ -198,6 +198,7 @@ export function TransactionForm({ controlState, visibleTagColumns }: Transaction
           tagNameDisplay={controlState.tagNameDisplay}
           longTagNames={controlState.longTagNames}
           showTagDetails={showTagDetails}
+          showTagTooltips={controlState.showTagTooltips}
           hideFooter={consolidatedFooter}
           onAddSplit={handleAddSplit}
         />

@@ -20,9 +20,10 @@ interface SplitRowProps {
   showLineDescription: boolean;
   compact: boolean;
   tagDisplayMode: 'text' | 'pills' | 'pills-inline';
-  tagNameDisplay?: 'full' | 'truncate-tooltip' | 'code-only';
+  tagNameDisplay?: 'truncate-tooltip' | 'code-only';
   longTagNames?: boolean;
   showTagDetails?: boolean;
+  showTagTooltips?: boolean;
   totalAmount: number;
   rowIndex: number;
   canDelete: boolean;
@@ -42,9 +43,10 @@ export function SplitRow({
   showLineDescription,
   compact,
   tagDisplayMode,
-  tagNameDisplay = 'full',
+  tagNameDisplay = 'truncate-tooltip',
   longTagNames = false,
   showTagDetails = false,
+  showTagTooltips = true,
   totalAmount,
   rowIndex,
   canDelete,
@@ -126,18 +128,14 @@ export function SplitRow({
 
   const cellPadding = compact ? 'px-1.5 py-1' : 'px-2 py-1.5';
 
-  // Get all tag assignments for expanded detail view
-  const getExpandedTagDetails = () => {
-    const details: { category: string; tags: { code: string; name: string }[] }[] = [];
-    for (const categoryId of visibleTagColumns) {
-      const category = activeTagCategories.find((c) => c.id === categoryId);
-      if (!category) continue;
-      const ids = getSelectedTagIds(categoryId);
-      if (ids.length === 0) continue;
-      const tags = category.tags.filter((t) => ids.includes(t.id));
-      details.push({ category: category.name, tags });
-    }
-    return details;
+  // Get tag detail for a specific category (for column-aligned detail strip)
+  const getTagDetailForCategory = (categoryId: string) => {
+    const category = activeTagCategories.find((c) => c.id === categoryId);
+    if (!category) return null;
+    const ids = getSelectedTagIds(categoryId);
+    if (ids.length === 0) return null;
+    const tags = category.tags.filter((t) => ids.includes(t.id));
+    return tags;
   };
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -217,6 +215,7 @@ export function SplitRow({
                 compact={compact}
                 displayMode={tagDisplayMode}
                 nameDisplay={tagNameDisplay}
+                showTooltips={showTagTooltips}
               />
             </div>
           );
@@ -272,22 +271,43 @@ export function SplitRow({
       </div>
     </div>
 
-    {/* Tag detail strip — controlled by "Tag details" toggle */}
-    {showTagDetails && (tagNameDisplay === 'truncate-tooltip' || tagNameDisplay === 'code-only') && (
-      <div className={`bg-gray-50 border-t border-gray-100 ${compact ? 'px-3 py-1.5' : 'px-4 py-2'}`}>
-        <div className="flex flex-wrap gap-x-6 gap-y-1">
-          {getExpandedTagDetails().map(({ category, tags }) => (
-            <div key={category} className={`flex items-baseline gap-1.5 ${compact ? 'text-[10px]' : 'text-xs'}`}>
-              <span className="font-medium text-gray-500">{category}:</span>
-              <span className="text-gray-700">
-                {tags.map((t) => `${t.code} - ${t.name}`).join(', ')}
-              </span>
+    {/* Tag detail strip — column-aligned with the row above */}
+    {showTagDetails && (
+      <div className="flex bg-gray-50/80 border-t border-gray-100">
+        {/* Account spacer */}
+        <div className={`${cellPadding} flex-1 min-w-[120px]`} />
+        {/* Fund spacer */}
+        <div className={`${cellPadding} flex-1 min-w-[100px]`} />
+        {/* Tag detail columns — one per visible tag category */}
+        {visibleTagColumns.map((categoryId) => {
+          const tags = getTagDetailForCategory(categoryId);
+          return (
+            <div
+              key={categoryId}
+              className={`${cellPadding} flex-1 min-w-[100px] ${compact ? 'text-[10px]' : 'text-xs'}`}
+            >
+              {tags && tags.length > 0 ? (
+                <div className="space-y-0.5">
+                  {tags.map((t) => (
+                    <div key={t.code} className="text-gray-600 leading-snug">
+                      <span className="font-medium text-gray-500">{t.code}</span>
+                      <span className="text-gray-400"> — </span>
+                      <span>{t.name}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-gray-300">—</span>
+              )}
             </div>
-          ))}
-          {getExpandedTagDetails().length === 0 && (
-            <span className={`text-gray-400 italic ${compact ? 'text-[10px]' : 'text-xs'}`}>No tags assigned</span>
-          )}
-        </div>
+          );
+        })}
+        {/* Line description spacer */}
+        {showLineDescription && <div className={`${cellPadding} flex-1 min-w-[100px]`} />}
+        {/* % spacer */}
+        <div className={`${cellPadding} w-[70px] flex-shrink-0`} />
+        {/* Amount spacer */}
+        <div className={`${cellPadding} w-[110px] flex-shrink-0`} />
       </div>
     )}
     </>

@@ -105,17 +105,6 @@ export function ControlPanel({
 
           {/* Layout Section */}
           <Section title="Layout">
-            <RadioGroup
-              label="Width"
-              options={[
-                { value: '1080', label: '1080' },
-                { value: '1280', label: '1280' },
-                { value: '1440', label: '1440' },
-                { value: 'full', label: 'Full' },
-              ]}
-              value={state.containerWidth}
-              onChange={(v) => updateState('containerWidth', v as ControlPanelState['containerWidth'])}
-            />
             <ToggleControl
               label="Consolidated Footer"
               checked={state.footerLayout === 'consolidated'}
@@ -134,8 +123,8 @@ export function ControlPanel({
               label="Tags"
               options={[
                 { value: 'text', label: 'Text' },
-                { value: 'pills', label: 'Pills' },
                 { value: 'pills-inline', label: 'Inline' },
+                { value: 'pills', label: 'Pills' },
               ]}
               value={state.tagDisplayMode}
               onChange={(v) => updateState('tagDisplayMode', v as ControlPanelState['tagDisplayMode'])}
@@ -143,7 +132,6 @@ export function ControlPanel({
             <RadioGroup
               label="Tag Names"
               options={[
-                { value: 'full', label: 'Full' },
                 { value: 'truncate-tooltip', label: 'Truncate' },
                 { value: 'code-only', label: 'Code' },
               ]}
@@ -158,6 +146,11 @@ export function ControlPanel({
               label="Long Tag Names"
               checked={state.longTagNames}
               onChange={(v) => updateState('longTagNames', v)}
+            />
+            <ToggleControl
+              label="Tag Tooltips"
+              checked={state.showTagTooltips}
+              onChange={(v) => updateState('showTagTooltips', v)}
             />
           </Section>
         </div>

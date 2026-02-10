@@ -11,9 +11,10 @@ interface DistributionTableProps {
   showLineDescription: boolean;
   compact: boolean;
   tagDisplayMode: 'text' | 'pills' | 'pills-inline';
-  tagNameDisplay?: 'full' | 'truncate-tooltip' | 'code-only';
+  tagNameDisplay?: 'truncate-tooltip' | 'code-only';
   longTagNames?: boolean;
   showTagDetails?: boolean;
+  showTagTooltips?: boolean;
   hideFooter?: boolean;
   onAddSplit?: () => void;
 }
@@ -26,9 +27,10 @@ export function DistributionTable({
   showLineDescription,
   compact,
   tagDisplayMode,
-  tagNameDisplay = 'full',
+  tagNameDisplay = 'truncate-tooltip',
   longTagNames = false,
   showTagDetails = false,
+  showTagTooltips = true,
   hideFooter = false,
   onAddSplit,
 }: DistributionTableProps) {
@@ -164,6 +166,7 @@ export function DistributionTable({
               tagNameDisplay={tagNameDisplay}
               longTagNames={longTagNames}
               showTagDetails={showTagDetails}
+              showTagTooltips={showTagTooltips}
               totalAmount={totalAmount}
               rowIndex={index}
               canDelete={splits.length > 1}

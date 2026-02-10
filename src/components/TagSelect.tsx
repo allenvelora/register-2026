@@ -9,7 +9,8 @@ interface TagSelectProps {
   compact?: boolean;
   className?: string;
   displayMode?: 'text' | 'pills' | 'pills-inline';
-  nameDisplay?: 'full' | 'truncate-tooltip' | 'code-only';
+  nameDisplay?: 'truncate-tooltip' | 'code-only';
+  showTooltips?: boolean;
 }
 
 export function TagSelect({
@@ -20,14 +21,14 @@ export function TagSelect({
   compact = false,
   className = '',
   displayMode = 'text',
-  nameDisplay = 'full',
+  nameDisplay = 'truncate-tooltip',
+  showTooltips = true,
 }: TagSelectProps) {
   // Tag name formatting helpers
   const formatTagLabel = (tag: Tag) => {
     switch (nameDisplay) {
       case 'code-only': return tag.code;
-      case 'truncate-tooltip': return `${tag.code} - ${tag.name}`;
-      case 'full': default: return `${tag.code} - ${tag.name}`;
+      case 'truncate-tooltip': default: return `${tag.code} - ${tag.name}`;
     }
   };
   const fullTagLabel = (tag: Tag) => `${tag.code} - ${tag.name}`;
@@ -165,7 +166,7 @@ export function TagSelect({
     return `${selectedTags.length} Tags`;
   };
   const displayText = getDisplayText();
-  const displayTooltip = selectedTags.length === 1 && isTruncate ? fullTagLabel(selectedTags[0]) : undefined;
+  const displayTooltip = showTooltips && selectedTags.length === 1 && isTruncate ? fullTagLabel(selectedTags[0]) : undefined;
 
   const handleRemoveTag = (tagId: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -203,7 +204,7 @@ export function TagSelect({
     <div ref={containerRef} className={`relative w-full ${className}`}>
       {/* Pills display mode - compact pill with popover */}
       {displayMode === 'pills' ? (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 min-w-0 w-full">
           {/* Main pill trigger - shows "N Tags" or single tag code */}
           <button
             ref={triggerRef}
@@ -236,8 +237,9 @@ export function TagSelect({
               }
               handleFieldNavigation(e, triggerRef.current);
             }}
+            title={showTooltips && selectedTags.length === 1 ? fullTagLabel(selectedTags[0]) : undefined}
             className={`
-              inline-flex items-center justify-center rounded-full transition-colors
+              inline-flex items-center rounded-full transition-colors min-w-0 max-w-full overflow-hidden
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
               ${selectedTags.length > 0 
                 ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' 
@@ -245,7 +247,7 @@ export function TagSelect({
               ${compact ? 'px-2 py-0.5 text-[10px] min-w-[40px]' : 'px-2.5 py-1 text-xs min-w-[50px]'}
             `}
           >
-            {getPillDisplayText()}
+            <span className="truncate">{getPillDisplayText()}</span>
             {selectedTags.length > 1 && (
               <svg className={`ml-1 ${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 5l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
@@ -293,7 +295,7 @@ export function TagSelect({
 
           {/* Tags popover - shows selected tags with dismiss buttons */}
           {showTagsPopover && selectedTags.length > 1 && (
-            <div className="absolute z-20 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg ring-1 ring-black/10 min-w-[160px]">
+            <div className="absolute z-20 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg ring-1 ring-black/10 min-w-[240px] max-w-[360px]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500 font-medium">Selected Tags</span>
                 <button
@@ -308,18 +310,17 @@ export function TagSelect({
                   Clear All
                 </button>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-col gap-1.5">
                 {selectedTags.map((tag) => (
                   <span
                     key={tag.id}
-                    title={isTruncate ? fullTagLabel(tag) : undefined}
+                    title={showTooltips ? fullTagLabel(tag) : undefined}
                     className={`
-                      inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full
+                      inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full w-full
                       ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'}
-                      ${isTruncate ? 'max-w-[180px]' : ''}
                     `}
                   >
-                    <span className={isTruncate ? 'truncate' : ''}>{formatTagLabel(tag)}</span>
+                    <span className="truncate flex-1 min-w-0">{formatTagLabel(tag)}</span>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -357,7 +358,7 @@ export function TagSelect({
         <div
           onClick={() => !isOpen && !showTagsPopover && selectedTags.length <= 1 && setIsOpen(true)}
           className={`
-            flex items-start gap-1 rounded border border-gray-300 bg-white cursor-text
+            flex items-center gap-1 rounded border border-gray-300 bg-white cursor-text w-full
             hover:border-gray-400 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500
             ${compact ? 'px-1.5 py-0.5 min-h-[26px]' : 'px-2 py-1 min-h-[34px]'}
           `}
@@ -400,7 +401,7 @@ export function TagSelect({
               
               {/* Tags popover for inline mode */}
               {showTagsPopover && (
-                <div className="absolute z-20 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg ring-1 ring-black/10 min-w-[160px]">
+                <div className="absolute z-20 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg ring-1 ring-black/10 min-w-[240px] max-w-[360px]">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-gray-500 font-medium">Selected Tags</span>
                     <button
@@ -415,18 +416,17 @@ export function TagSelect({
                       Clear All
                     </button>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-col gap-1.5">
                     {selectedTags.map((tag) => (
                       <span
                         key={tag.id}
-                        title={isTruncate ? fullTagLabel(tag) : undefined}
+                        title={showTooltips ? fullTagLabel(tag) : undefined}
                         className={`
-                          inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full
+                          inline-flex items-center gap-1 bg-blue-100 text-blue-800 rounded-full w-full
                           ${compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'}
-                          ${isTruncate ? 'max-w-[180px]' : ''}
                         `}
                       >
-                        <span className={isTruncate ? 'truncate' : ''}>{formatTagLabel(tag)}</span>
+                        <span className="truncate flex-1 min-w-0">{formatTagLabel(tag)}</span>
                         <button
                           type="button"
                           onClick={(e) => {
@@ -476,14 +476,14 @@ export function TagSelect({
                 }
                 handleFieldNavigation(e, triggerRef.current);
               }}
-              title={nameDisplay !== 'full' ? fullTagLabel(selectedTags[0]) : undefined}
+              title={showTooltips ? fullTagLabel(selectedTags[0]) : undefined}
               className={`
-                inline-flex items-center gap-0.5 bg-blue-100 text-blue-800 rounded-full text-left max-w-full
+                inline-flex items-center gap-0.5 bg-blue-100 text-blue-800 rounded-full text-left max-w-full overflow-hidden
                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
                 ${compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2 py-0.5 text-xs'}
               `}
             >
-              <span className="truncate">{formatTagLabel(selectedTags[0])}</span>
+              <span className="truncate min-w-0">{formatTagLabel(selectedTags[0])}</span>
               <span
                 role="button"
                 onClick={(e) => {

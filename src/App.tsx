@@ -11,7 +11,6 @@ function App() {
     isMinimized,
     toggleMinimized,
     visibleTagColumns,
-    containerWidthPx,
   } = useControlPanel();
 
   const tabs: { id: typeof state.activePage; label: string }[] = [
@@ -23,10 +22,7 @@ function App() {
     <div className={`min-h-screen bg-white ${state.compactMode ? 'compact' : ''}`}>
       {/* Top nav tabs */}
       <div className="border-b border-gray-200 bg-white sticky top-0 z-40">
-        <div
-          className="mx-auto flex items-center gap-6 px-6 transition-all duration-300"
-          style={{ maxWidth: containerWidthPx }}
-        >
+        <div className="flex items-center gap-6 px-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -44,11 +40,8 @@ function App() {
         </div>
       </div>
 
-      {/* Main content with configurable width */}
-      <div
-        className="mx-auto p-6 transition-all duration-300"
-        style={{ maxWidth: containerWidthPx }}
-      >
+      {/* Main content */}
+      <div className="p-6">
         {state.activePage === 'transactions' ? (
           <TransactionForm
             controlState={state}
