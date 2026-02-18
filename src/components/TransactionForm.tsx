@@ -15,12 +15,13 @@ import type { ControlPanelState } from '../hooks/useControlPanel';
 interface TransactionFormProps {
   controlState: ControlPanelState;
   visibleTagColumns: string[];
+  defaultShowTagDetails?: boolean;
 }
 
-export function TransactionForm({ controlState, visibleTagColumns }: TransactionFormProps) {
+export function TransactionForm({ controlState, visibleTagColumns, defaultShowTagDetails = false }: TransactionFormProps) {
   const [transaction, setTransaction] = useState<Transaction>(sampleTransaction);
   const [showLineDescription, setShowLineDescription] = useState(false);
-  const [showTagDetails, setShowTagDetails] = useState(false);
+  const [showTagDetails, setShowTagDetails] = useState(defaultShowTagDetails);
 
   const handleFieldChange = <K extends keyof Transaction>(field: K, value: Transaction[K]) => {
     setTransaction((t) => ({ ...t, [field]: value }));
